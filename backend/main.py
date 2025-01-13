@@ -4,6 +4,7 @@ from fastapi import FastAPI, File, UploadFile
 import xmltodict
 import os
 import chardet
+import traceback
 
 app = FastAPI()
 
@@ -20,27 +21,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/convertir/")
-async def convertir_xml_a_json(file: UploadFile = File(...)):
+@app.post("/analizarComprobante/")
+async def analizar_comprobante(file: UploadFile = File(...)):
     try:
-
         # Intenta leer el archivo xml, si no se puede, utiliza chardet para detectar la codificación
         try:
             content = await file.read()
             content = content.decode('utf-8')
-            print(1)
-        except UnicodeDecodeError:
 
+        except UnicodeDecodeError:
             content = await file.read()
-            print(2)
-            encoding = chardet.detect(content)['encoding']
-            print(3)
+            encoding = chardet.detect(content)
             content = content.decode(encoding).encode('utf-8')
-            print(4)
+        
+        # Convierte el contenido del archivo xml a un diccionario
+        data_dict = xmltodict.parse(content)
+        #dentro de data dict tengo un string cuya clave es comprobante  y su valor es un xml con la informacion del comprobante
+        #quiero convertir ese xml a un diccionario y colocarlo en la clave comprobante
+        data_dict['autorizacion']['comprobante'] = xmltodict.parse(data_dict['autorizacion']['comprobante'])
+
+
+        content = extract_data(data_dict)
 
     except Exception as e:
         print(5)
-        return JSONResponse(content={"error": str(e)}, status_code=400)
+        return JSONResponse(content={"error": str(e), "traceback":
+                                    traceback.format_exc()
+                                     
+                                     }, status_code=400)
     print(6)
     return content
 
