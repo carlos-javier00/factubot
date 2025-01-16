@@ -10,7 +10,6 @@ import SelectOriginFolderComponent from './steps/SelectOriginFolderComponent';
 import MoveNotCompleteComponent from './steps/MoveNotCompleteComponent';
 import AnalyzeComponent from './steps/AnalyzeComponent';
 
-
 // Componentes de ejemplo para cada paso
 const Step4Component = () => <div>Clasificar comprobantes</div>;
 

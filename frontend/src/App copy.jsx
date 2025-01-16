@@ -201,7 +201,7 @@ function App() {
     );
   };
 
-  const renderFlatTable = (data) => {
+  const renderFlatTable = (comprobantes) => {
     if (!data || !data.length) return null;
 
     return (
@@ -241,33 +241,33 @@ function App() {
           <TableBody>
             {data.map((row, index) => (
               <TableRow key={index}>
-                <TableCell>{row.fechaEmisionDocSustento}</TableCell>
-                <TableCell>{row.numDocModificado}</TableCell>
-                <TableCell>{row.tipoIdentificacionComprador}</TableCell>
-                <TableCell>{row.razonSocial}</TableCell>
-                <TableCell>{row.codDoc}</TableCell>
-                <TableCell>{row.estab}</TableCell>
-                <TableCell>{row.ptoEmi}</TableCell>
-                <TableCell>{row.secuencial}</TableCell>
-                <TableCell>{row.idComprobante}</TableCell>
-                <TableCell>{row.ruc}</TableCell>
-                <TableCell>{row.isDocente ? "Sí" : "No"}</TableCell>
-                <TableCell>{row.fecha}</TableCell>
-                <TableCell>{row.formaPago}</TableCell>
-                <TableCell>{row.formaPagoAdmitida}</TableCell>
-                <TableCell>{row.nombre}</TableCell>
-                <TableCell>{row.contribuyenteRimpe}</TableCell>
-                <TableCell>{row.fechaEmision}</TableCell>
-                <TableCell>{row.fechaAutorizacion}</TableCell>
-                <TableCell>{row.valor}</TableCell>
-                <TableCell>{JSON.stringify(row.infoAdicional)}</TableCell>
-                <TableCell>{row.tipo}</TableCell>
-                <TableCell>{row.codigoPorcentaje}</TableCell>
-                <TableCell>{row.codigoAdmitido}</TableCell>
-                <TableCell>{row.tipoDocumento}</TableCell>
-                <TableCell>{row.numeroAutorizacion}</TableCell>
-                <TableCell>{row.xml_path}</TableCell>
-                <TableCell>{row.pdf_path}</TableCell>
+                <TableCell>{comprobante.analisis.fechaEmisionDocSustento}</TableCell>
+                <TableCell>{comprobante.analisis.numDocModificado}</TableCell>
+                <TableCell>{comprobante.analisis.tipoIdentificacionComprador}</TableCell>
+                <TableCell>{comprobante.analisis.razonSocial}</TableCell>
+                <TableCell>{comprobante.analisis.codDoc}</TableCell>
+                <TableCell>{comprobante.analisis.estab}</TableCell>
+                <TableCell>{comprobante.analisis.ptoEmi}</TableCell>
+                <TableCell>{comprobante.analisis.secuencial}</TableCell>
+                <TableCell>{comprobante.analisis.idComprobante}</TableCell>
+                <TableCell>{comprobante.analisis.ruc}</TableCell>
+                <TableCell>{comprobante.analisis.isDocente ? "Sí" : "No"}</TableCell>
+                <TableCell>{comprobante.analisis.fecha}</TableCell>
+                <TableCell>{comprobante.analisis.formaPago}</TableCell>
+                <TableCell>{comprobante.analisis.formaPagoAdmitida}</TableCell>
+                <TableCell>{comprobante.analisis.nombre}</TableCell>
+                <TableCell>{comprobante.analisis.contribuyenteRimpe}</TableCell>
+                <TableCell>{comprobante.analisis.fechaEmision}</TableCell>
+                <TableCell>{comprobante.analisis.fechaAutorizacion}</TableCell>
+                <TableCell>{comprobante.analisis.valor}</TableCell>
+                <TableCell>{JSON.stringify(comprobante.analisis.infoAdicional)}</TableCell>
+                <TableCell>{comprobante.analisis.tipo}</TableCell>
+                <TableCell>{comprobante.analisis.codigoPorcentaje}</TableCell>
+                <TableCell>{comprobante.analisis.codigoAdmitido}</TableCell>
+                <TableCell>{comprobante.analisis.tipoDocumento}</TableCell>
+                <TableCell>{comprobante.analisis.numeroAutorizacion}</TableCell>
+                <TableCell>{comprobante.analisis.xml_path}</TableCell>
+                <TableCell>{comprobante.analisis.pdf_path}</TableCell>
               </TableRow>
             ))}
           </TableBody>
