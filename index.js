@@ -1,48 +1,26 @@
-const files = [
-    "1.pdf", 
-    "1.xml",
-    "2.pdf",
-    "2.xml",
-    "3.pdf",
-    "3.xml",
-    "4.pdf",
-    "4.xml",
-    "5.pdf",
-]
+const axios = require('axios');
+const FormData = require('form-data');
+const fs = require('fs');
+let data = new FormData();
+data.append('files', fs.createReadStream('/Users/thedamnandres/Downloads/12/1712202401176815426000120010120569937840832658711.xml'));
+data.append('files', fs.createReadStream('/Users/thedamnandres/Downloads/12/1712202401170408664200120011000000010608881661715.xml'));
+data.append('files', fs.createReadStream('/Users/thedamnandres/Downloads/12/1712202401171300803300120010020000010366668477618.xml'));
 
-const clasificar = (files) => {
-    //esta funcion va a retornar grupos de archivos del mismo nombre.
-    //cada grupo debe conterner un archivo pdf y un archivo xml
-    //si contiene ambos archivos vamos a agregar un valor de true a la propiedad "completo"
-    //si no contiene ambos archivos vamos a agregar un valor de false a la propiedad "completo"
+let config = {
+  method: 'post',
+  maxBodyLength: Infinity,
+  url: 'http://127.0.0.1:8000/analizarComprobantes/',
+  headers: { 
+    'accept': 'application/json', 
+    ...data.getHeaders()
+  },
+  data : data
+};
 
-    const grupos = []
-
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i]
-        const nombre = file.split(".")[0]
-        const extension = file.split(".")[1]
-
-        const grupo = grupos.find(grupo => grupo.nombre === nombre)
-
-        if (grupo) {
-            if (extension === "pdf") {
-                grupo.pdf = file
-            } else {
-                grupo.xml = file
-            }
-        } else {
-            grupos.push({
-                nombre,
-                [extension]: file
-            })
-        }
-    }
-
-    return grupos.map(grupo => {
-        grupo.completo = grupo.pdf && grupo.xml ? true : false
-        return grupo
-    })
-}
-
-console.log(clasificar(files))
+axios.request(config)
+.then((response) => {
+  console.log(JSON.stringify(response.data));
+})
+.catch((error) => {
+  console.log(error);
+});

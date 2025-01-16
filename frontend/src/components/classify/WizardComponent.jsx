@@ -7,10 +7,11 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Dialog } from '@mui/material';
 import SelectOriginFolderComponent from './steps/SelectOriginFolderComponent';
+import MoveNotCompleteComponent from './steps/MoveNotCompleteComponent';
+import AnalyzeComponent from './steps/AnalyzeComponent';
+
 
 // Componentes de ejemplo para cada paso
-const Step2Component = () => <div>Mover comprobantes no procesables</div>;
-const Step3Component = () => <div>Analizar comprobantes</div>;
 const Step4Component = () => <div>Clasificar comprobantes</div>;
 
 
@@ -32,20 +33,30 @@ export default function WizardComponent() {
             />
         },
         {
-            name: 'Mover comprobantes no procesables', optional: false, skipped: false, component: <Step2Component
+            name: 'Mover comprobantes no procesables', optional: false, skipped: false, component: <MoveNotCompleteComponent
                 setComprobantes={setComprobantes}
                 comprobantes={comprobantes}
+                loading={loading}
+                setLoading={setLoading}
             />
         },
-        { name: 'Analizar comprobantes', optional: false, skipped: false, component: <Step3Component /> },
-        { name: 'Clasificar comprobantes', optional: false, skipped: false, component: <Step4Component /> },
+        { name: 'Analizar comprobantes', optional: false, skipped: false, component: <AnalyzeComponent 
+                setComprobantes={setComprobantes}
+                comprobantes={comprobantes}
+                loading={loading}
+                setLoading={setLoading}
+                /> 
+        },
+        { name: 'Clasificar comprobantes', optional: false, skipped: false, component: <Step4Component /> }, 
     ];
 
     const isStepOptional = (step) => {
+
         return steps[step].optional;
     };
 
     const isStepSkipped = (step) => {
+
         return skipped.has(step);
     };
 
@@ -116,7 +127,9 @@ export default function WizardComponent() {
                 </React.Fragment>
             ) : (
                 <React.Fragment>
-                    <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography>
+                    <Box sx={{ mt: 2 }}>
+                        {steps[activeStep].component}
+                    </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
                         <Button
                             color="inherit"
@@ -136,9 +149,7 @@ export default function WizardComponent() {
                             {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                         </Button>
                     </Box>
-                    <Box sx={{ mt: 2 }}>
-                        {steps[activeStep].component}
-                    </Box>
+                    
                 </React.Fragment>
             )}
             <Dialog open={loading}>

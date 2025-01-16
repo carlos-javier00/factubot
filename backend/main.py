@@ -52,6 +52,40 @@ async def analizar_comprobante(file: UploadFile = File(...)):
     print(6)
     return content
 
+@app.post("/analizarComprobantes/")
+async def analizar_comprobantes(files: list[UploadFile] = File(...)):
+    try:
+        data = []
+        for file in files:
+            # Intenta leer el archivo xml, si no se puede, utiliza chardet para detectar la codificación
+            try:
+                content = await file.read()
+                content = content.decode('utf-8')
+
+            except UnicodeDecodeError:
+                content = await file.read()
+                encoding = chardet.detect(content)
+                content = content.decode(encoding).encode('utf-8')
+            
+            # Obten el nombre del archivo
+            filename = file.filename
+            # Convierte el contenido del archivo xml a un diccionario
+            data_dict = xmltodict.parse(content)
+            #dentro de data dict tengo un string cuya clave es comprobante  y su valor es un xml con la informacion del comprobante
+            #quiero convertir ese xml a un diccionario y colocarlo en la clave comprobante
+            data_dict['autorizacion']['comprobante'] = xmltodict.parse(data_dict['autorizacion']['comprobante'])
+            analisis = extract_data(data_dict)
+            data.append({
+                "filename": filename,
+                "analisis": analisis
+            })
+
+    except Exception as e:
+        return JSONResponse(content={"error": str(e), "traceback":
+                                    traceback.format_exc()
+                                     }, status_code=400)
+    return data
+
     
 
 def extract_data(data_dict):
@@ -66,6 +100,7 @@ def extract_data(data_dict):
         contenidoComprobante = comprobante[tipoDocumento]
 
         # Datos necesario extraidos 
+
         fechaEmisionDocSustento = contenidoComprobante.get('infoNotaCredito', {}).get('fechaEmisionDocSustento', '-')
         numDocModificado = contenidoComprobante.get('infoNotaCredito', {}).get('numDocModificado', '-')
         tipoIdentificacionComprador = contenidoComprobante.get('infoFactura', {}).get('tipoIdentificacionComprador', '-')
