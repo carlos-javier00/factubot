@@ -3,6 +3,8 @@ import axios from 'axios';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper } from '@mui/material';
+import * as XLSX from 'xlsx';
+import Button from '@mui/material/Button';
 
 const ANALYZER_WORKER_URL = import.meta.env.VITE_ANALYZER_WORKER_URL;
 
@@ -59,6 +61,24 @@ const AnalyzeComponent = ({
         handleAnalyze();
     }, []);
 
+    const handleExportExcel = () => {
+        if (!comprobantes.length) {
+            console.error("No hay comprobantes para exportar.");
+            return;
+        }
+
+        const data = comprobantes.filter(comprobante => comprobante.analisis).map(comprobante => {
+            return {
+            ...comprobante.analisis,
+            infoAdicional: JSON.stringify(comprobante.analisis.infoAdicional)
+            };
+        });
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Análisis");
+        XLSX.writeFile(wb, "analisis_comprobantes.xlsx");
+    };
+
     const renderFlatTable = (comprobantes) => {
         if (!comprobantes || !comprobantes.length) return null;
 
@@ -112,7 +132,7 @@ const AnalyzeComponent = ({
                     <TableCell>{comprobante.analisis?.isDocente ? "Sí" : "No"}</TableCell>
                     <TableCell>{comprobante.analisis?.fecha}</TableCell>
                     <TableCell>{comprobante.analisis?.formaPago}</TableCell>
-                    <TableCell>{comprobante.analisis?.formaPagoAdmitida}</TableCell>
+                    <TableCell>{JSON.stringify(comprobante.analisis?.formaPagoAdmitida)}</TableCell>
                     <TableCell>{comprobante.analisis?.nombre}</TableCell>
                     <TableCell>{comprobante.analisis?.contribuyenteRimpe}</TableCell>
                     <TableCell>{comprobante.analisis?.fechaEmision}</TableCell>
@@ -136,6 +156,9 @@ const AnalyzeComponent = ({
     return (
         <Box>
             <Typography variant="h6">Análisis de comprobantes</Typography>
+            <Button variant="contained" color="primary" onClick={handleExportExcel}>
+                Exportar a Excel
+            </Button>
             {renderFlatTable(comprobantes)}
         </Box>
     );
