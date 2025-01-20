@@ -6,7 +6,10 @@ import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper
 import * as XLSX from 'xlsx';
 import Button from '@mui/material/Button';
 
+// variale de entorno para la URL del worker
 const ANALYZER_WORKER_URL = import.meta.env.VITE_ANALYZER_WORKER_URL;
+// quiero pasarlo a Int
+const MAX_ITEMS_PER_REQUEST = parseInt(import.meta.env.VITE_ANALYZER_BATCH_SIZE, 10);
 
 const AnalyzeComponent = ({   
     loading,
@@ -15,46 +18,66 @@ const AnalyzeComponent = ({
     setComprobantes,
 }) => {
     const analyzeWithWorker = async (comprobantes) => {
+        setLoading({
+            loading: true,
+            title: "Analizando comprobantes",
+            infinite: true, 
+        });
+    
         try {
-            let data = new FormData();
-            comprobantes.forEach(comprobante => {
-                if (comprobante.xml) {
-                    data.append('files', new Blob([comprobante.xml], { type: 'application/xml' }), `${comprobante.nombre}.xml`);
-                }
-            });
-
-            let config = {
-                method: 'post',
-                maxBodyLength: Infinity,
-                url: `${ANALYZER_WORKER_URL}/analizarComprobantes/`,
-                headers: { 
-                    'accept': 'application/json',
-                },
-                data : data
-            };
-
-            const response = await axios.request(config);
-            const analyzedData = response.data;
-
+            let allAnalyzedData = [];
+            let localProgress = 0;
+    
+            // Dividir los comprobantes en grupos de máximo 50 elementos
+            for (let i = 0; i < comprobantes.length; i += MAX_ITEMS_PER_REQUEST) {
+                const batch = comprobantes.slice(i, i + MAX_ITEMS_PER_REQUEST);
+    
+                let data = new FormData();
+                batch.forEach(comprobante => {
+                    if (comprobante.xml) {
+                        data.append('files', new Blob([comprobante.xml], { type: 'application/xml' }), `${comprobante.nombre}.xml`);
+                    }
+                });
+    
+                let config = {
+                    method: 'post',
+                    maxBodyLength: Infinity,
+                    url: `${ANALYZER_WORKER_URL}/analizarComprobantes/`,
+                    headers: { 
+                        'accept': 'application/json',
+                    },
+                    data: data
+                };
+    
+                const response = await axios.request(config);
+                allAnalyzedData = allAnalyzedData.concat(response.data);
+                localProgress += batch.length;
+            }
+    
             const _comprobantes = comprobantes.map(comprobante => {
-                const analysisResult = analyzedData.find(result => result.filename === `${comprobante.nombre}.xml`);
+                const analysisResult = allAnalyzedData.find(result => result.filename === `${comprobante.nombre}.xml`);
                 return {
                     ...comprobante,
                     analisis: analysisResult ? analysisResult.analisis : null,
                     analizable: analysisResult ? true : false,
                 };
             });
-
+    
             setComprobantes(_comprobantes);
         } catch (error) {
             console.error("Error al analizar los comprobantes:", error);
         }
+    
+        setLoading({
+            loading: false,
+            title: "",
+            progress: 0,
+            total: 0,
+        });
     };
 
     const handleAnalyze = async () => {
-        setLoading(true);
         await analyzeWithWorker(comprobantes);
-        setLoading(false);
     };
 
     useEffect(() => {
@@ -112,8 +135,7 @@ const AnalyzeComponent = ({
                   <TableCell>codigoAdmitido</TableCell>
                   <TableCell>tipoDocumento</TableCell>
                   <TableCell>numeroAutorizacion</TableCell>
-                  <TableCell>xml_path</TableCell>
-                  <TableCell>pdf_path</TableCell>
+                  <TableCell>ruta</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -144,8 +166,7 @@ const AnalyzeComponent = ({
                     <TableCell>{comprobante.analisis?.codigoAdmitido}</TableCell>
                     <TableCell>{comprobante.analisis?.tipoDocumento}</TableCell>
                     <TableCell>{comprobante.analisis?.numeroAutorizacion}</TableCell>
-                    <TableCell>{comprobante.analisis?.xml_path}</TableCell>
-                    <TableCell>{comprobante.analisis?.pdf_path}</TableCell>
+                    <TableCell>{comprobante.analisis?.ruta}</TableCell>
                 </TableRow>
                 ))}
               </TableBody>
@@ -155,6 +176,7 @@ const AnalyzeComponent = ({
     };
     return (
         <Box>
+            <Typography variant="h6">{ MAX_ITEMS_PER_REQUEST }</Typography>
             <Typography variant="h6">Análisis de comprobantes</Typography>
             <Button variant="contained" color="primary" onClick={handleExportExcel}>
                 Exportar a Excel

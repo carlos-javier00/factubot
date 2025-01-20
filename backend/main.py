@@ -212,14 +212,14 @@ def extract_data(data_dict):
 def calcular_ruta(analisis):
     try:
         if not analisis:
-            return "error_lectura"
+            return f"error_forma_pago/{analisis['razonSocial']}/{analisis['numeroAutorizacion']}"
         if analisis['isDocente']:
             if not analisis['formaPagoAdmitida']:
-                return "error_forma_pago"
+                return f"error_forma_pago/{analisis['razonSocial']}/{analisis['numeroAutorizacion']}"
             return f"docentes/{analisis['fecha']}/{analisis['estab']}{analisis['ptoEmi']}{analisis['secuencial']}"
         if analisis['tipoDocumento'] == "factura":
             if not analisis['formaPagoAdmitida']:
-                return "error_forma_pago"
+                return f"error_forma_pago/{analisis['razonSocial']}/{analisis['numeroAutorizacion']}"
             return f"proveedores/{analisis['razonSocial']}/{analisis['estab']}{analisis['ptoEmi']}{analisis['secuencial']}"
         return f"nota_credito/{analisis['razonSocial']}/{analisis['estab']}{analisis['ptoEmi']}{analisis['secuencial']}"
     except Exception as e:

@@ -1,26 +1,24 @@
-const axios = require('axios');
-const FormData = require('form-data');
-const fs = require('fs');
-let data = new FormData();
-data.append('files', fs.createReadStream('/Users/thedamnandres/Downloads/12/1712202401176815426000120010120569937840832658711.xml'));
-data.append('files', fs.createReadStream('/Users/thedamnandres/Downloads/12/1712202401170408664200120011000000010608881661715.xml'));
-data.append('files', fs.createReadStream('/Users/thedamnandres/Downloads/12/1712202401171300803300120010020000010366668477618.xml'));
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
+import MoveNotCompleteComponent from "./frontend/src/components/classify/steps/MoveNotCompleteComponent";
 
-let config = {
-  method: 'post',
-  maxBodyLength: Infinity,
-  url: 'http://127.0.0.1:8000/analizarComprobantes/',
-  headers: { 
-    'accept': 'application/json', 
-    ...data.getHeaders()
-  },
-  data : data
+const App = () => {
+    const [loading, setLoading] = useState(false);
+    const [comprobantes, setComprobantes] = useState([
+        { nombre: "comprobante1", completo: false, pdf: new Blob(["Contenido PDF 1"], { type: "application/pdf" }) },
+        { nombre: "comprobante2", completo: false, xml: new Blob(["<xml>Contenido XML 2</xml>"], { type: "application/xml" }) },
+        { nombre: "comprobante3", completo: true, pdf: new Blob(["Contenido PDF 3"], { type: "application/pdf" }) },
+    ]);
+
+    return (
+        <MoveNotCompleteComponent
+            loading={loading}
+            setLoading={setLoading}
+            comprobantes={comprobantes}
+            setComprobantes={setComprobantes}
+        />
+    );
 };
 
-axios.request(config)
-.then((response) => {
-  console.log(JSON.stringify(response.data));
-})
-.catch((error) => {
-  console.log(error);
-});
+// Renderizar la aplicación
+ReactDOM.render(<App />, document.getElementById("root"));

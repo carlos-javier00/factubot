@@ -53,6 +53,7 @@ export default function SelectOriginFolderComponent({
             }
         }
 
+
         setComprobantes(_comprobantes.map((comprobante) => {
             comprobante.completo = comprobante.pdf && comprobante.xml ? true : false;
             return comprobante;
