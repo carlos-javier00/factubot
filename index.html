@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Comprobantes</title>
+</head>
+<body>
+    <button id="mover-comprobantes">Mover Comprobantes</button>
+    <script>
+        async function prueba(comprobantes) {
+            try {
+                // Solicitar al usuario que seleccione una carpeta
+                const directoryHandle = await window.showDirectoryPicker();
+                const folderPath = directoryHandle.name; // Obtiene el nombre de la carpeta seleccionada
+                console.log("Archivos se moverán a la carpeta:", folderPath);
+
+                // Filtrar solo los comprobantes no completos
+                const notCompleteComprobantes = comprobantes.filter(comprobante => !comprobante.completo);
+
+                // Mover comprobantes no completos a la carpeta seleccionada
+                for (const comprobante of notCompleteComprobantes) {
+                    try {
+                        const fileName = `${comprobante.nombre}.${comprobante.pdf ? "pdf" : "xml"}`;
+                        const fileContent = comprobante.pdf || comprobante.xml;
+
+                        if (fileContent) {
+                            // Crear el archivo en la carpeta destino
+                            const fileHandle = await directoryHandle.getFileHandle(fileName, { create: true });
+                            const writableStream = await fileHandle.createWritable();
+
+                            // Escribir contenido en el archivo
+                            await writableStream.write(fileContent);
+                            await writableStream.close();
+
+                            console.log(`Archivo "${fileName}" creado exitosamente en la carpeta "${folderPath}"`);
+                        }
+                    } catch (fileError) {
+                        console.error(`Error al crear el archivo para ${comprobante.nombre}:`, fileError.message);
+                    }
+                }
+
+                console.log("Proceso completado.");
+            } catch (err) {
+                console.error("Error al mover los comprobantes:", err.message);
+            }
+        }
+
+        // Datos de prueba
+        const comprobantes = [
+            { nombre: "Comprobante1", completo: false, pdf: "Contenido PDF 1", xml: null },
+            { nombre: "Comprobante2", completo: true, pdf: null, xml: "Contenido XML 2" },
+            { nombre: "Comprobante3", completo: false, pdf: null, xml: "Contenido XML 3" },
+        ];
+
+        // Agregar un evento al botón para iniciar el proceso
+        document.getElementById("mover-comprobantes").addEventListener("click", () => {
+            prueba(comprobantes); // Llama a la función dentro de un evento de usuario
+        });
+    </script>
+</body>
+</html>
