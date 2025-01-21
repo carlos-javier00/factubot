@@ -1,0 +1,11 @@
+#gitignore for react
+node_modules
+build
+.DS_Store
+
+#gitignore for python
+__pycache__
+*.pyc
+.venv
+venv
+
