@@ -52,7 +52,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/analizarComprobante/")
+@app.post("/api/analizarComprobante/")
 async def analizar_comprobante(file: UploadFile = File(...)):
     try:
         # Intenta leer el archivo xml, si no se puede, utiliza chardet para detectar la codificación
@@ -83,7 +83,7 @@ async def analizar_comprobante(file: UploadFile = File(...)):
     print(6)
     return content
 
-@app.post("/analizarComprobantes/")
+@app.post("/api/analizarComprobantes/")
 async def analizar_comprobantes(files: list[UploadFile] = File(...)):
     try:
         data = []
