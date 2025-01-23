@@ -24,8 +24,11 @@ export default function SelectOriginFolderComponent({
 
     const [error, setError] = useState(null);
 
+    const [selectedFiles, setSelectedFiles] = useState([]);
+
     const handleFolderChange = (event) => {
-        const selectedFiles = Array.from(event.target.files);
+        
+        setSelectedFiles(Array.from(event.target.files));
 
         if (!selectedFiles.length) {
             setError("No se seleccionaron archivos.");
@@ -75,6 +78,10 @@ export default function SelectOriginFolderComponent({
                 Seleccionar Carpeta
             </Button>
         </label>
+        {selectedFiles.length > 0 && 
+        <Typography variant="body1">
+            Archivos seleccionados: {selectedFiles.length}
+        </Typography>}
     </>;
 
-};
+};  

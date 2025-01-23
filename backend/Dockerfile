@@ -1,4 +1,4 @@
-# Usar una imagen base de Python en lugar de Node.js (según la estructura que veo usa Python)
+# Usar una imagen base de Python
 FROM python:3.11-slim
 
 # Establecer el directorio de trabajo en el contenedor
@@ -16,5 +16,5 @@ COPY . .
 # Exponer el puerto en el que la aplicación se ejecutará
 EXPOSE 8000
 
-# Comando para ejecutar la aplicación
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]
+# Comando para ejecutar la aplicación en modo de desarrollo
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--reload"]

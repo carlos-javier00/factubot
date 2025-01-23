@@ -6,7 +6,7 @@ import os
 import chardet
 import traceback
 from datetime import datetime
-
+import use_parameters
 
 formas_de_pago = [
     {"codigo": "1", "descripcion": "Sin utilizacion del sistema financiero", "admitido": False},
@@ -33,9 +33,7 @@ tipos_de_documento = [
     {"codigo": "7", "descripcion": "COMPROBANTE DE RETENCIÓN"}
 ]
 
-docentes = [
-    "1726716325001",
-]
+docentes = use_parameters.obtener_lista_rucs('variables.xlsx')
 
 app = FastAPI()
 
@@ -100,13 +98,21 @@ async def analizar_comprobantes(files: list[UploadFile] = File(...)):
             
             # Obten el nombre del archivo
             filename = file.filename
+            filename_no_ext = os.path.splitext(filename)[0]
             # Convierte el contenido del archivo xml a un diccionario
             data_dict = xmltodict.parse(content)
             #dentro de data dict tengo un string cuya clave es comprobante  y su valor es un xml con la informacion del comprobante
             #quiero convertir ese xml a un diccionario y colocarlo en la clave comprobante
             data_dict['autorizacion']['comprobante'] = xmltodict.parse(data_dict['autorizacion']['comprobante'])
-            analisis = extract_data(data_dict)
-            analisis['ruta'] = calcular_ruta(analisis)
+           
+            try:
+                analisis = extract_data(data_dict)
+                analisis['ruta'] = calcular_ruta(analisis)
+            except Exception as e:
+                # Manejar el error y agregar un análisis vacío
+                print(f"Error al extraer datos: {e}")
+                analisis = {"ruta": f"error_lectura/{filename_no_ext}", "error": str(e)}
+
             data.append({
                 "filename": filename,
                 "analisis": analisis
@@ -149,7 +155,6 @@ def extract_data(data_dict):
         secuencial = contenidoComprobante.get('infoTributaria', {}).get('secuencial', '-')
         idComprobante = f"{estab}-{ptoEmi}-{secuencial}"
         ruc = contenidoComprobante.get('infoTributaria', {}).get('ruc', '-')
-        isDocente = is_ruc_in_docentes_list(ruc) and contains_string(contenidoComprobante.get('infoAdicional', {}).get('campoAdicional', []))
         string_fecha = infoComprobante.get('fechaEmision', '-')
         formaPago = infoComprobante.get('pagos', {}).get('pago', {}).get('formaPago', '-')
         formaPagoAdmitida = any([forma['admitido'] for forma in formas_de_pago if forma['codigo'] == formaPago])
@@ -162,8 +167,9 @@ def extract_data(data_dict):
         regimenRimpe = infoComprobante.get('regimenRimpe', '-')
         fechaEmision = infoComprobante.get('fechaEmision', '-')
         fecha_excel = data_dict['autorizacion'].get('fechaAutorizacion', '-')
-        valor = infoComprobante.get('importeTotal', '-')
+        importeTotal = infoComprobante.get('importeTotal', '-')
         infoAdicional = contenidoComprobante.get('infoAdicional', {}).get('campoAdicional', '-')
+        isDocente = is_ruc_in_docentes_list(ruc) and contains_string(infoAdicional)
         tipo = infoComprobante.get('tipo', '-')
         codigoPorcentaje = infoComprobante.get('codigoPorcentaje', '-')
         codigoAdmitido = infoComprobante.get('codigoAdmitido', '-')
@@ -196,7 +202,7 @@ def extract_data(data_dict):
             "contribuyenteRimpe": regimenRimpe,
             "fechaEmision": fechaEmision,
             "fechaAutorizacion": fecha_excel,
-            "valor": valor if valor else "-",
+            "importeTotal": importeTotal if importeTotal else "-",
             "infoAdicional": infoAdicional,
             "tipo": tipo,
             "codigoPorcentaje": codigoPorcentaje,
@@ -212,7 +218,7 @@ def extract_data(data_dict):
 def calcular_ruta(analisis):
     try:
         if not analisis:
-            return f"error_forma_pago/{analisis['razonSocial']}/{analisis['numeroAutorizacion']}"
+            return f"error_lectura"
         if analisis['isDocente']:
             if not analisis['formaPagoAdmitida']:
                 return f"error_forma_pago/{analisis['razonSocial']}/{analisis['numeroAutorizacion']}"
@@ -226,12 +232,12 @@ def calcular_ruta(analisis):
         return str(e)
 
 
-
 def contains_string(infoAdicional, search_string="202501"):
-    for item in infoAdicional:
-        if search_string in item.get('@nombre', '') or search_string in item.get('#text', ''):
-            return True
-    return False
+    if isinstance(infoAdicional, list):
+        infoAdicional = " ".join([f"{item.get('@nombre', '')} {item.get('#text', '')}" for item in infoAdicional])
+    elif isinstance(infoAdicional, dict):
+        infoAdicional = " ".join([f"{key} {value}" for key, value in infoAdicional.items()])
+    return search_string in infoAdicional
 
 
 def is_ruc_in_docentes_list(ruc):
