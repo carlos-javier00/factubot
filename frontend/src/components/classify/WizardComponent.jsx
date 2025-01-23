@@ -118,7 +118,6 @@ export default function WizardComponent() {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Button onClick={() => setLoading(true)}>Probar dialogo de carga</Button>
       <Typography>{comprobantes.length}</Typography>
       <Stepper activeStep={activeStep}>
         {steps.map((step, index) => {
@@ -151,7 +150,6 @@ export default function WizardComponent() {
         </React.Fragment>
       ) : (
         <React.Fragment>
-          <Box sx={{ mt: 2 }}>{steps[activeStep].component}</Box>
           <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
             <Button
               color="inherit"
@@ -171,6 +169,7 @@ export default function WizardComponent() {
               {activeStep === steps.length - 1 ? "Finish" : "Next"}
             </Button>
           </Box>
+          <Box sx={{ mt: 2 }}>{steps[activeStep].component}</Box>
         </React.Fragment>
       )}
       <Dialog open={loading.loading}>
@@ -188,7 +187,6 @@ export default function WizardComponent() {
           {!loading.infinite && (
             <Typography variant="body1">{`Progreso: ${loading.progress} de ${loading.total}`}</Typography>
           )}
-          <Button onClick={() => setLoading(false)}>Cerrar</Button>
         </div>
       </Dialog>
     </Box>

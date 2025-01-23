@@ -213,6 +213,19 @@ const AnalyzeComponent = ({
     <Box>
       <Typography variant="h6">{MAX_ITEMS_PER_REQUEST}</Typography>
       <Typography variant="h6">Análisis de comprobantes</Typography>
+      <Paper>
+        <Box p={2}>
+          <Typography variant="body1">
+            Proveedores: {comprobantes.filter((comprobante) => comprobante.analisis?.ruta.includes("proveedor")).length}
+          </Typography>
+          <Typography variant="body1">
+            Docentes: {comprobantes.filter((comprobante) => comprobante.analisis?.ruta.includes("docente")).length}
+          </Typography>
+          <Typography variant="body1">
+            Notas de credito: {comprobantes.filter((comprobante) => comprobante.analisis?.ruta.includes("nota")).length}
+          </Typography>
+        </Box>
+      </Paper>
       <Button variant="contained" color="primary" onClick={handleExportExcel}>
         Exportar a Excel
       </Button>

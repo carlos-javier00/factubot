@@ -2,6 +2,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, File, UploadFile
 import xmltodict
+import json
 import os
 import chardet
 import traceback
@@ -169,7 +170,7 @@ def extract_data(data_dict):
         fecha_excel = data_dict['autorizacion'].get('fechaAutorizacion', '-')
         importeTotal = infoComprobante.get('importeTotal', '-')
         infoAdicional = contenidoComprobante.get('infoAdicional', {}).get('campoAdicional', '-')
-        isDocente = is_ruc_in_docentes_list(ruc) and contains_string(infoAdicional)
+        isDocente = is_ruc_in_docentes_list(ruc) and contains_string(infoAdicional,'[')
         tipo = infoComprobante.get('tipo', '-')
         codigoPorcentaje = infoComprobante.get('codigoPorcentaje', '-')
         codigoAdmitido = infoComprobante.get('codigoAdmitido', '-')
@@ -233,10 +234,7 @@ def calcular_ruta(analisis):
 
 
 def contains_string(infoAdicional, search_string="202501"):
-    if isinstance(infoAdicional, list):
-        infoAdicional = " ".join([f"{item.get('@nombre', '')} {item.get('#text', '')}" for item in infoAdicional])
-    elif isinstance(infoAdicional, dict):
-        infoAdicional = " ".join([f"{key} {value}" for key, value in infoAdicional.items()])
+    infoAdicional = json.dumps(infoAdicional)
     return search_string in infoAdicional
 
 

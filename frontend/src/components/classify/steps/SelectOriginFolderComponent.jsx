@@ -27,16 +27,18 @@ export default function SelectOriginFolderComponent({
     const [selectedFiles, setSelectedFiles] = useState([]);
 
     const handleFolderChange = (event) => {
-        
-        setSelectedFiles(Array.from(event.target.files));
 
-        if (!selectedFiles.length) {
+        const _selectedFiles = Array.from(event.target.files);
+        
+        setSelectedFiles(_selectedFiles);
+
+        if (!_selectedFiles.length > 0) {
             setError("No se seleccionaron archivos.");
             return;
         }
 
         // Filtra solo los archivos XML y PDF
-        const validFiles = selectedFiles.filter((file) =>
+        const validFiles = _selectedFiles.filter((file) =>
             file.name.endsWith(".xml") || file.name.endsWith(".pdf")
         );
 
