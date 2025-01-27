@@ -223,12 +223,12 @@ def calcular_ruta(analisis):
         if analisis['isDocente']:
             if not analisis['formaPagoAdmitida']:
                 return f"error_forma_pago/{analisis['razonSocial']}/{analisis['numeroAutorizacion']}"
-            return f"docentes/{analisis['fecha']}/{analisis['estab']}{analisis['ptoEmi']}{analisis['secuencial']}"
+            return f"docentes/{analisis['razonSocial']}/{analisis['estab']}{analisis['ptoEmi']}{analisis['secuencial']}/{analisis['estab']}{analisis['ptoEmi']}{analisis['secuencial']}"
         if analisis['tipoDocumento'] == "factura":
             if not analisis['formaPagoAdmitida']:
                 return f"error_forma_pago/{analisis['razonSocial']}/{analisis['numeroAutorizacion']}"
-            return f"proveedores/{analisis['razonSocial']}/{analisis['estab']}{analisis['ptoEmi']}{analisis['secuencial']}"
-        return f"nota_credito/{analisis['razonSocial']}/{analisis['estab']}{analisis['ptoEmi']}{analisis['secuencial']}"
+            return f"proveedores/{analisis['razonSocial']}/{analisis['estab']}{analisis['ptoEmi']}{analisis['secuencial']}/{analisis['estab']}{analisis['ptoEmi']}{analisis['secuencial']}"
+        return f"nota_credito/{analisis['razonSocial']}/{analisis['estab']}{analisis['ptoEmi']}{analisis['secuencial']}/{analisis['estab']}{analisis['ptoEmi']}{analisis['secuencial']}"
     except Exception as e:
         return str(e)
 
