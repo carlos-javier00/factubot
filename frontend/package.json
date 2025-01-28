@@ -5,19 +5,23 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "predeploy": "npm run build", 
+    "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@azure/msal-browser": "^4.0.2",
+    "@azure/msal-react": "^3.0.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/material": "^6.3.1",
+    "@mui/icons-material": "^6.4.1",
+    "@mui/material": "^6.4.1",
     "axios": "^1.7.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^7.1.3",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
