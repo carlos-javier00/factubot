@@ -34,6 +34,12 @@ tipos_de_documento = [
     {"codigo": "7", "descripcion": "COMPROBANTE DE RETENCIÓN"}
 ]
 
+def get_is_forma_impuesto_admitido(codigo):
+    for forma in formas_de_impuestos:
+        if forma['codigo'] == codigo:
+            return forma['admitido']
+    return False
+
 docentes = use_parameters.obtener_lista_rucs('variables.xlsx')
 
 app = FastAPI()
@@ -112,7 +118,7 @@ async def analizar_comprobantes(files: list[UploadFile] = File(...)):
             except Exception as e:
                 # Manejar el error y agregar un análisis vacío
                 print(f"Error al extraer datos: {e}")
-                analisis = {"ruta": f"error_lectura/{filename_no_ext}", "error": str(e)}
+                analisis = {"ruta": f"error_lectura/{filename_no_ext}", "error": str(e), "traceback": traceback.format_exc()}
 
             data.append({
                 "filename": filename,
@@ -172,8 +178,14 @@ def extract_data(data_dict):
         infoAdicional = contenidoComprobante.get('infoAdicional', {}).get('campoAdicional', '-')
         isDocente = is_ruc_in_docentes_list(ruc) and contains_string(infoAdicional,'[')
         tipo = infoComprobante.get('tipo', '-')
-        codigoPorcentaje = infoComprobante.get('codigoPorcentaje', '-')
-        codigoAdmitido = infoComprobante.get('codigoAdmitido', '-')
+        totalImpuesto = infoComprobante.get('totalConImpuestos', {}).get('totalImpuesto', {})
+        
+        if isinstance(totalImpuesto, list):
+            codigoPorcentaje = [impuesto.get('codigoPorcentaje', '-') for impuesto in totalImpuesto]
+            codigoAdmitido = [get_is_forma_impuesto_admitido(impuesto.get('codigoPorcentaje', '-')) for impuesto in totalImpuesto]
+        else:
+            codigoPorcentaje = totalImpuesto.get('codigoPorcentaje', '-')
+            codigoAdmitido = get_is_forma_impuesto_admitido(codigoPorcentaje)
         numeroAutorizacion = data_dict['autorizacion'].get('numeroAutorizacion', '-')
         
         try:
@@ -204,10 +216,10 @@ def extract_data(data_dict):
             "fechaEmision": fechaEmision,
             "fechaAutorizacion": fecha_excel,
             "importeTotal": importeTotal if importeTotal else "-",
-            "infoAdicional": infoAdicional,
+            "infoAdicional": json.dumps(infoAdicional),
             "tipo": tipo,
-            "codigoPorcentaje": codigoPorcentaje,
-            "codigoAdmitido": codigoAdmitido,
+            "codigoPorcentaje": json.dumps(codigoPorcentaje),
+            "codigoAdmitido": json.dumps(codigoAdmitido),
             "tipoDocumento": tipoDocumento,
             "numeroAutorizacion": numeroAutorizacion,
             "raw": data_dict

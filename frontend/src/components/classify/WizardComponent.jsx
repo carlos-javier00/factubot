@@ -36,19 +36,6 @@ export default function WizardComponent() {
       ),
     },
     {
-      name: "Mover comprobantes no procesables",
-      optional: false,
-      skipped: false,
-      component: (
-        <MoveNotCompleteComponent
-          setComprobantes={setComprobantes}
-          comprobantes={comprobantes}
-          loading={loading}
-          setLoading={setLoading}
-        />
-      ),
-    },
-    {
       name: "Analizar comprobantes",
       optional: false,
       skipped: false,
@@ -118,7 +105,6 @@ export default function WizardComponent() {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Typography>{comprobantes.length}</Typography>
       <Stepper activeStep={activeStep}>
         {steps.map((step, index) => {
           const stepProps = {};
@@ -141,11 +127,11 @@ export default function WizardComponent() {
       {activeStep === steps.length ? (
         <React.Fragment>
           <Typography sx={{ mt: 2, mb: 1 }}>
-            All steps completed - you&apos;re finished
+            Nada por hacer, proceso finalizado
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
             <Box sx={{ flex: "1 1 auto" }} />
-            <Button onClick={handleReset}>Reset</Button>
+            <Button onClick={handleReset}>Volver a empezar</Button>
           </Box>
         </React.Fragment>
       ) : (
@@ -157,16 +143,16 @@ export default function WizardComponent() {
               onClick={handleBack}
               sx={{ mr: 1 }}
             >
-              Back
+              Atrás
             </Button>
             <Box sx={{ flex: "1 1 auto" }} />
             {isStepOptional(activeStep) && (
               <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
-                Skip
+                Saltar
               </Button>
             )}
-            <Button onClick={handleNext}>
-              {activeStep === steps.length - 1 ? "Finish" : "Next"}
+            <Button onClick={handleNext} disabled={comprobantes.filter(comprobante => !comprobante.completo).length > 0 || comprobantes.length === 0}>
+              {activeStep === steps.length - 1 ? "Finalizar" : "Siguiente"}
             </Button>
           </Box>
           <Box sx={{ mt: 2 }}>{steps[activeStep].component}</Box>

@@ -13,6 +13,8 @@ import {
 } from "@mui/material";
 import * as XLSX from "xlsx";
 import Button from "@mui/material/Button";
+import { DataGrid } from '@mui/x-data-grid';
+
 
 // variale de entorno para la URL del worker
 const ANALYZER_WORKER_URL = import.meta.env.VITE_ANALYZER_WORKER_URL;
@@ -123,110 +125,94 @@ const AnalyzeComponent = ({
 
   const renderFlatTable = (comprobantes) => {
     if (!comprobantes || !comprobantes.length) return null;
+    const columns = [
+      { field: 'nombre', headerName: 'Nombre', width: 130 },
+      { field: 'fechaEmisionDocSustento', headerName: 'Fecha Emisión Doc Sustento', width: 180 },
+      { field: 'numDocModificado', headerName: 'Num Doc Modificado', width: 150 },
+      { field: 'tipoIdentificacionComprador', headerName: 'Tipo Identificación Comprador', width: 200 },
+      { field: 'razonSocial', headerName: 'Razón Social', width: 150 },
+      { field: 'codDoc', headerName: 'Cod Doc', width: 100 },
+      { field: 'estab', headerName: 'Estab', width: 100 },
+      { field: 'ptoEmi', headerName: 'Pto Emi', width: 100 },
+      { field: 'secuencial', headerName: 'Secuencial', width: 120 },
+      { field: 'idComprobante', headerName: 'ID Comprobante', width: 150 },
+      { field: 'ruc', headerName: 'RUC', width: 130 },
+      { field: 'isDocente', headerName: 'Es Docente', width: 100, valueGetter: (params) => JSON.stringify(params?.row?.isDocente) },
+      { field: 'fecha', headerName: 'Fecha', width: 130 },
+      { field: 'formaPago', headerName: 'Forma Pago', width: 130 },
+      { field: 'formaPagoAdmitida', headerName: 'Forma Pago Admitida', width: 180 },
+      { field: 'nombre', headerName: 'Nombre', width: 130 },
+      { field: 'contribuyenteRimpe', headerName: 'Contribuyente Rimpe', width: 180 },
+      { field: 'fechaEmision', headerName: 'Fecha Emisión', width: 150 },
+      { field: 'fechaAutorizacion', headerName: 'Fecha Autorización', width: 180 },
+      { field: 'importeTotal', headerName: 'Importe Total', width: 150 },
+      { field: 'infoAdicional', headerName: 'Info Adicional', width: 180},
+      { field: 'tipo', headerName: 'Tipo', width: 100 },
+      { field: 'codigoPorcentaje', headerName: 'Código Porcentaje', width: 150 },
+      { field: 'codigoAdmitido', headerName: 'Código Admitido', width: 150},
+      { field: 'tipoDocumento', headerName: 'Tipo Documento', width: 150 },
+      { field: 'numeroAutorizacion', headerName: 'Número Autorización', width: 180 },
+      { field: 'ruta', headerName: 'Ruta', width: 130 },
+    ];
+    const rows = comprobantes.map((comprobante, index) => ({
+      id: comprobante.analisis?.numeroAutorizacion || index,
+      nombre: comprobante.nombre,
+      fechaEmisionDocSustento: comprobante.analisis?.fechaEmisionDocSustento,
+      numDocModificado: comprobante.analisis?.numDocModificado,
+      tipoIdentificacionComprador: comprobante.analisis?.tipoIdentificacionComprador,
+      razonSocial: comprobante.analisis?.razonSocial,
+      codDoc: comprobante.analisis?.codDoc,
+      estab: comprobante.analisis?.estab,
+      ptoEmi: comprobante.analisis?.ptoEmi,
+      secuencial: comprobante.analisis?.secuencial,
+      idComprobante: comprobante.analisis?.idComprobante,
+      ruc: comprobante.analisis?.ruc,
+      isDocente: comprobante.analisis?.isDocente,
+      fecha: comprobante.analisis?.fecha,
+      formaPago: comprobante.analisis?.formaPago,
+      formaPagoAdmitida: comprobante.analisis?.formaPagoAdmitida,
+      contribuyenteRimpe: comprobante.analisis?.contribuyenteRimpe,
+      fechaEmision: comprobante.analisis?.fechaEmision,
+      fechaAutorizacion: comprobante.analisis?.fechaAutorizacion,
+      importeTotal: comprobante.analisis?.importeTotal,
+      infoAdicional: comprobante.analisis?.infoAdicional,
+      tipo: comprobante.analisis?.tipo,
+      codigoPorcentaje: comprobante.analisis?.codigoPorcentaje,
+      codigoAdmitido: comprobante.analisis?.codigoAdmitido,
+      tipoDocumento: comprobante.analisis?.tipoDocumento,
+      numeroAutorizacion: comprobante.analisis?.numeroAutorizacion,
+      ruta: comprobante.analisis?.ruta,
+    }));
+
+    const paginationModel = { page: 0, pageSize: 5 };
 
     return (
-      <TableContainer component={Paper} style={{ marginTop: "20px" }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>comprobante.nombre</TableCell>
-              <TableCell>fechaEmisionDocSustento</TableCell>
-              <TableCell>numDocModificado</TableCell>
-              <TableCell>tipoIdentificacionComprador</TableCell>
-              <TableCell>razonSocial</TableCell>
-              <TableCell>codDoc</TableCell>
-              <TableCell>estab</TableCell>
-              <TableCell>ptoEmi</TableCell>
-              <TableCell>secuencial</TableCell>
-              <TableCell>idComprobante</TableCell>
-              <TableCell>ruc</TableCell>
-              <TableCell>isDocente</TableCell>
-              <TableCell>fecha</TableCell>
-              <TableCell>formaPago</TableCell>
-              <TableCell>formaPagoAdmitida</TableCell>
-              <TableCell>nombre</TableCell>
-              <TableCell>contribuyenteRimpe</TableCell>
-              <TableCell>fechaEmision</TableCell>
-              <TableCell>fechaAutorizacion</TableCell>
-              <TableCell>importeTotal</TableCell>
-              <TableCell>infoAdicional</TableCell>
-              <TableCell>tipo</TableCell>
-              <TableCell>codigoPorcentaje</TableCell>
-              <TableCell>codigoAdmitido</TableCell>
-              <TableCell>tipoDocumento</TableCell>
-              <TableCell>numeroAutorizacion</TableCell>
-              <TableCell>ruta</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {comprobantes.map((comprobante, index) => (
-              <TableRow key={index} style={comprobante.analisis?.error ? { backgroundColor: "red" } : {}}>
-                <TableCell>{comprobante.nombre}</TableCell>
-                <TableCell>
-                  {comprobante.analisis?.fechaEmisionDocSustento}
-                </TableCell>
-                <TableCell>{comprobante.analisis?.numDocModificado}</TableCell>
-                <TableCell>
-                  {comprobante.analisis?.tipoIdentificacionComprador}
-                </TableCell>
-                <TableCell>{comprobante.analisis?.razonSocial}</TableCell>
-                <TableCell>{comprobante.analisis?.codDoc}</TableCell>
-                <TableCell>{comprobante.analisis?.estab}</TableCell>
-                <TableCell>{comprobante.analisis?.ptoEmi}</TableCell>
-                <TableCell>{comprobante.analisis?.secuencial}</TableCell>
-                <TableCell>{comprobante.analisis?.idComprobante}</TableCell>
-                <TableCell>{comprobante.analisis?.ruc}</TableCell>
-                <TableCell>
-                  {comprobante.analisis?.isDocente ? "Sí" : "No"}
-                </TableCell>
-                <TableCell>{comprobante.analisis?.fecha}</TableCell>
-                <TableCell>{comprobante.analisis?.formaPago}</TableCell>
-                <TableCell>
-                  {JSON.stringify(comprobante.analisis?.formaPagoAdmitida)}
-                </TableCell>
-                <TableCell>{comprobante.analisis?.nombre}</TableCell>
-                <TableCell>
-                  {comprobante.analisis?.contribuyenteRimpe}
-                </TableCell>
-                <TableCell>{comprobante.analisis?.fechaEmision}</TableCell>
-                <TableCell>{comprobante.analisis?.fechaAutorizacion}</TableCell>
-                <TableCell>{comprobante.analisis?.importeTotal}</TableCell>
-                <TableCell>
-                  {JSON.stringify(comprobante.analisis?.infoAdicional)}
-                </TableCell>
-                <TableCell>{comprobante.analisis?.tipo}</TableCell>
-                <TableCell>{comprobante.analisis?.codigoPorcentaje}</TableCell>
-                <TableCell>{comprobante.analisis?.codigoAdmitido}</TableCell>
-                <TableCell>{comprobante.analisis?.tipoDocumento}</TableCell>
-                <TableCell>
-                  {comprobante.analisis?.numeroAutorizacion}
-                </TableCell>
-                <TableCell>{comprobante.analisis?.ruta}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Paper sx={{ height: 400, width: '100%', marginTop: "20px" }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          initialState={{ pagination: { paginationModel } }}
+          pageSizeOptions={[5, 10]}
+          sx={{ border: 0 }}
+        />
+      </Paper>
     );
   };
   return (
     <Box>
-      <Typography variant="h6">{MAX_ITEMS_PER_REQUEST}</Typography>
       <Typography variant="h6">Análisis de comprobantes</Typography>
-      <Paper>
-        <Box p={2}>
-          <Typography variant="body1">
-            Proveedores: {comprobantes.filter((comprobante) => comprobante.analisis?.ruta.includes("proveedor")).length}
-          </Typography>
-          <Typography variant="body1">
-            Docentes: {comprobantes.filter((comprobante) => comprobante.analisis?.ruta.includes("docente")).length}
-          </Typography>
-          <Typography variant="body1">
-            Notas de credito: {comprobantes.filter((comprobante) => comprobante.analisis?.ruta.includes("nota")).length}
-          </Typography>
-        </Box>
+      <Paper style={{ padding: "20px", marginTop: "20px" }}>
+        <Typography variant="body1">
+          Proveedores: {comprobantes.filter((comprobante) => comprobante.analisis?.ruta.includes("proveedor")).length}
+        </Typography>
+        <Typography variant="body1">
+          Docentes: {comprobantes.filter((comprobante) => comprobante.analisis?.ruta.includes("docente")).length}
+        </Typography>
+        <Typography variant="body1">
+          Notas de credito: {comprobantes.filter((comprobante) => comprobante.analisis?.ruta.includes("nota")).length}
+        </Typography>
       </Paper>
-      <Button variant="contained" color="primary" onClick={handleExportExcel}>
+      <Button variant="contained" color="primary" onClick={handleExportExcel} style={{ marginTop: "20px" }}>
         Exportar a Excel
       </Button>
       {renderFlatTable(comprobantes)}

@@ -82,22 +82,10 @@ export default function MoveNotCompleteComponent({
 
     return (
         <Container>
-            <Typography variant="h6">
-                Hay {comprobantes.filter(comprobante => !comprobante.completo).length} comprobantes incompletos. Mueva a otra ubicación.
-            </Typography>
             {error && <Alert severity="error">{error}</Alert>}
             <Button onClick={handleMoveNotComplete} disabled={loading}>
                 {loading ? "Moviendo..." : "Seleccionar carpeta de destino"}
             </Button>
-
-            <Typography variant="body1" style={{ marginTop: "20px" }}>
-                <strong>Archivos guardados:</strong>
-                <ul>
-                    {savedPaths.map((path, index) => (
-                        <li key={index}>{path}</li>
-                    ))}
-                </ul>
-            </Typography>
         </Container>
     );
 }

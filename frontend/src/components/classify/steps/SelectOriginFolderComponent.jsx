@@ -11,9 +11,10 @@ import {
     TableRow,
     Paper,
     Alert,
+    Box,
 } from "@mui/material";
 import * as XLSX from "xlsx";
-
+import MoveNotCompleteComponent from "./MoveNotCompleteComponent";
 
 export default function SelectOriginFolderComponent({
     loading,
@@ -29,7 +30,7 @@ export default function SelectOriginFolderComponent({
     const handleFolderChange = (event) => {
 
         const _selectedFiles = Array.from(event.target.files);
-        
+
         setSelectedFiles(_selectedFiles);
 
         if (!_selectedFiles.length > 0) {
@@ -63,7 +64,7 @@ export default function SelectOriginFolderComponent({
             comprobante.completo = comprobante.pdf && comprobante.xml ? true : false;
             return comprobante;
         }));
-        
+
     };
 
     return <>
@@ -80,10 +81,57 @@ export default function SelectOriginFolderComponent({
                 Seleccionar Carpeta
             </Button>
         </label>
-        {selectedFiles.length > 0 && 
-        <Typography variant="body1">
-            Archivos seleccionados: {selectedFiles.length}
-        </Typography>}
+        {selectedFiles.length > 0 &&
+            <>
+                <Paper style={{ padding: "20px", marginTop: "20px" }} >
+                    <Typography variant="h6">Archivos seleccionados: {
+                        selectedFiles.length > 0 ? selectedFiles.length : 0
+                    }
+                    </Typography>
+                    <Typography variant="h6">Comprobantes procesables: {
+                        comprobantes.filter(comprobante => comprobante.completo).length
+                    }
+                    </Typography>
+                    {
+                        comprobantes.filter(comprobante => !comprobante.completo).length > 0 &&
+                        <>
+                            <Alert severity="warning" style={{ marginTop: "20px" }}>
+                                Hay comprobantes que no se pueden procesar, muevelos a otra carpeta.
+                            </Alert>
+                            <Box style={{ marginTop: "20px" }}>
+                                <MoveNotCompleteComponent
+                                    setComprobantes={setComprobantes}
+                                    comprobantes={comprobantes}
+                                    loading={loading}
+                                    setLoading={setLoading}
+
+                                />
+                            </Box>
+                        </>
+                    }
+                </Paper>
+                <TableContainer component={Paper} style={{ marginTop: "20px" }}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Nombre</TableCell>
+                                <TableCell>PDF</TableCell>
+                                <TableCell>XML</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {comprobantes.map((comprobante, index) => (
+                                <TableRow key={index}>
+                                    <TableCell>{comprobante.nombre}</TableCell>
+                                    <TableCell>{comprobante.pdf ? "Si" : "No"}</TableCell>
+                                    <TableCell>{comprobante.xml ? "Si" : "No"}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </>
+        }
     </>;
 
 };  

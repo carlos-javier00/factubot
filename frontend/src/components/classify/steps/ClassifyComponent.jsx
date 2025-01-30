@@ -88,9 +88,8 @@ export default function ClassifyComponent({
 
     return (
         <Container>
-            <Typography variant="h6">Crear Estructura de Carpetas y Archivos</Typography>
             <Button variant="contained" color="primary" onClick={handleCreate}>
-                Crear
+                Seleccionar carpeta de destino para clasificar los comprobantes
             </Button>
             {error && <Alert severity="error" style={{ marginTop: "20px" }}>{error}</Alert>}
             {success && <Alert severity="success" style={{ marginTop: "20px" }}>{success}</Alert>}
